@@ -62,7 +62,7 @@ median(daily.steps$steps)
 ##What is the average daily activity pattern?
 
 1. Calculate average steps for each of 5-minute interval during a 24-hour period.
-2. Make a time series plot (i.e. type = “l”) of the 5-minute interval (x-axis) and the  average number of steps taken, averaged across all days (y-axis)
+2. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the  average number of steps taken, averaged across all days (y-axis)
 3. Report which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 4. Observe and comment the average daily activity pattern
 
@@ -86,13 +86,16 @@ qplot(x=interval, y=mean, data = interval.mean.steps,  geom = "line",
 Report the 5-min interval, on average across all the days in the dataset, contains the maximum number of steps:
 
 ```{r chunk-7}
-interval.mean.steps[which.max(interval.mean.steps$mean), ]
+time <- interval.mean.steps[which.max(interval.mean.steps$mean), ]$interval
+timeh <- substr(time, 1, 1)
+timem <- substr(time, 2, 3)
+
 ```
 
 ###Observations:
 
 Based on steps taken pattern, the person's daily activity peaks around 
-`r interval.mean.steps[which.max(interval.mean.steps$mean), ]$interval` am.
+`r paste(timeh, timem, sep = ":")` am.
 
 ##Imputing missing values
 
@@ -117,9 +120,10 @@ tNA <- sqldf('
     WHERE d.steps IS NULL 
     ORDER BY d.date, d.interval ') 
 
+
 NROW(tNA) 
 ```
-Implement a strategy for filling in all of the missing values in the dataset. For this assignment the strategy is to use the mean for that 5-minute interval to replace missing valuse. Create a new dataset (t1) that is equal to the original dataset but with the missing data filled in. The dataset is ordered by date and interval. The following SQL statement combines the original “data” dataset set and the “interval.mean.steps” dataset that contains mean values of each 5-min interval ageraged across all days.
+Implement a strategy for filling in all of the missing values in the dataset. For this assignment the strategy is to use the mean for that 5-minute interval to replace missing valuse. Create a new dataset (t1) that is equal to the original dataset but with the missing data filled in. The dataset is ordered by date and interval. The following SQL statement combines the original "data" dataset set and the "interval.mean.steps" dataset that contains mean values of each 5-min interval ageraged across all days.
 
 ```{r chunk-10}
 t1 <- sqldf('  
@@ -179,8 +183,8 @@ The shape of the histogram remains the same as the histogram from removed missin
 
 ##Are there differences in activity patterns between weekdays and weekends?
 
-1. Use the dataset with the filled-in missing values for this part. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
-2. Make a panel plot containing a time series plot (i.e. type = “l”) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+1. Use the dataset with the filled-in missing values for this part. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
 Create a factor variable weektime with two levels (weekday, weekend). The folowing dataset t5 dataset contains data: average number of steps taken averaged across all weekday days and weekend days, 5-min intervals, and a facter variable weektime with two levels (weekday, weekend).
 
@@ -195,14 +199,14 @@ t5 <- sqldf('
     ORDER BY interval ')
 ```
 
-Make a panel plot containing a time series plot (i.e. type = “l”) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
 ```{r chunk-15}
 library("lattice")
 p <- xyplot(mean.steps ~ interval | factor(weektime), data=t5, 
        type = 'l',
        main="Average Number of Steps Taken 
-       \nAveraged Across All Weekday Days or Weekend Days",
+       Averaged Across All Weekday Days or Weekend Days",
        xlab="5-Minute Interval (military time)",
        ylab="Average Number of Steps Taken")
 print (p)    
